@@ -1,0 +1,458 @@
+-- Setting up persisence for bhd_hub_report
+
+\connect bds_hub_report
+
+CREATE SCHEMA pdata AUTHORIZATION blackduck;
+GRANT USAGE ON SCHEMA pdata TO blackduck_user ;
+GRANT SELECT, INSERT, UPDATE, TRUNCATE, DELETE, REFERENCES ON ALL TABLES IN SCHEMA pdata TO blackduck_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pdata to blackduck_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA pdata GRANT SELECT, INSERT, UPDATE, TRUNCATE, DELETE, REFERENCES ON TABLES TO blackduck_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA pdata GRANT ALL PRIVILEGES ON SEQUENCES TO blackduck_user;
+
+-- create pdata tables
+create table pdata.component ( like component including defaults including constraints including indexes );
+create table pdata.component_license ( like component_license including defaults including constraints including indexes );
+create table pdata.component_match_types ( like component_match_types including defaults including constraints including indexes );
+create table pdata.component_usages ( like component_usages including defaults including constraints including indexes );
+create table pdata.component_vulnerability ( like component_vulnerability including defaults including constraints including indexes );
+create table pdata.project ( like project including defaults including constraints including indexes );
+create table pdata.project_mapping ( like project_mapping including defaults including constraints including indexes );
+create table pdata.project_version ( like project_version including defaults including constraints including indexes );
+create table pdata.v_hub_report ( like v_hub_report including defaults including constraints including indexes );
+create table pdata.v_report_db ( like v_report_db including defaults including constraints including indexes );
+create table pdata.vulndb_record ( like vulndb_record including defaults including constraints including indexes );
+create table pdata.vulndb_record_classification ( like vulndb_record_classification including defaults including constraints including indexes );
+create table pdata.vulndb_record_reference_url ( like vulndb_record_reference_url including defaults including constraints including indexes );
+
+-- copy original data
+insert into pdata.component select * from component;
+insert into pdata.component_license select * from component_license;
+insert into pdata.component_match_types select * from component_match_types;
+insert into pdata.component_usages select * from component_usages;
+insert into pdata.component_vulnerability select * from component_vulnerability;
+insert into pdata.project select * from project;
+insert into pdata.project_mapping select * from project_mapping;
+insert into pdata.project_version select * from project_version;
+insert into pdata.v_hub_report select * from v_hub_report;
+insert into pdata.v_report_db select * from v_report_db;
+insert into pdata.vulndb_record select * from vulndb_record;
+insert into pdata.vulndb_record_classification select * from vulndb_record_classification;
+insert into pdata.vulndb_record_reference_url select * from vulndb_record_reference_url;
+
+--define triggers
+
+-----------------------------------
+-- processing table component
+-- component
+-- id project_version_id component_id component_version_id component_name component_version_name version_origin_id origin_id origin_name ignored policy_approval_status
+-- id
+-- id = new.id
+CREATE OR REPLACE FUNCTION component_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.component where  id = new.id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.component SET
+              id = new.id, project_version_id = new.project_version_id, component_id = new.component_id, component_version_id = new.component_version_id, component_name = new.component_name, component_version_name = new.component_version_name, version_origin_id = new.version_origin_id, origin_id = new.origin_id, origin_name = new.origin_name, ignored = new.ignored, policy_approval_status = new.policy_approval_status
+        WHERE  id = new.id ;
+     else
+        insert into pdata.component (
+          id,project_version_id,component_id,component_version_id,component_name,component_version_name,version_origin_id,origin_id,origin_name,ignored,policy_approval_status )
+        VALUES (
+          new.id,new.project_version_id,new.component_id,new.component_version_id,new.component_name,new.component_version_name,new.version_origin_id,new.origin_id,new.origin_name,new.ignored,new.policy_approval_status );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger component_update after update on component
+for each row execute procedure component_update();
+
+create trigger component_insert after insert on component
+for each row execute procedure component_update();
+
+-----------------------------------
+-- processing table component_license
+-- component_license
+-- id component_table_id license_display
+-- id
+-- id = new.id
+CREATE OR REPLACE FUNCTION component_license_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.component_license where  id = new.id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.component_license SET
+              id = new.id, component_table_id = new.component_table_id, license_display = new.license_display
+        WHERE  id = new.id ;
+     else
+        insert into pdata.component_license (
+          id,component_table_id,license_display )
+        VALUES (
+          new.id,new.component_table_id,new.license_display );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger component_license_update after update on component_license
+for each row execute procedure component_license_update();
+
+create trigger component_license_insert after insert on component_license
+for each row execute procedure component_license_update();
+
+-----------------------------------
+-- processing table component_match_types
+-- component_match_types
+-- component_id match_type
+-- component_id, match_type
+-- component_id = new.component_id AND match_type = new.match_type
+CREATE OR REPLACE FUNCTION component_match_types_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.component_match_types where  component_id = new.component_id AND match_type = new.match_type  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.component_match_types SET
+              component_id = new.component_id, match_type = new.match_type
+        WHERE  component_id = new.component_id AND match_type = new.match_type ;
+     else
+        insert into pdata.component_match_types (
+          component_id,match_type )
+        VALUES (
+          new.component_id,new.match_type );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger component_match_types_update after update on component_match_types
+for each row execute procedure component_match_types_update();
+
+create trigger component_match_types_insert after insert on component_match_types
+for each row execute procedure component_match_types_update();
+
+-----------------------------------
+-- processing table component_usages
+-- component_usages
+-- component_id usage
+-- component_id, usage
+-- component_id = new.component_id AND usage = new.usage
+CREATE OR REPLACE FUNCTION component_usages_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.component_usages where  component_id = new.component_id AND usage = new.usage  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.component_usages SET
+              component_id = new.component_id, usage = new.usage
+        WHERE  component_id = new.component_id AND usage = new.usage ;
+     else
+        insert into pdata.component_usages (
+          component_id,usage )
+        VALUES (
+          new.component_id,new.usage );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger component_usages_update after update on component_usages
+for each row execute procedure component_usages_update();
+
+create trigger component_usages_insert after insert on component_usages
+for each row execute procedure component_usages_update();
+
+-----------------------------------
+-- processing table component_vulnerability
+-- component_vulnerability
+-- component_table_id vuln_id severity remediation_status target_date actual_date comment description base_score exploit_score impact_score related_vuln_id
+-- component_table_id, vuln_id
+-- component_table_id = new.component_table_id AND vuln_id = new.vuln_id
+CREATE OR REPLACE FUNCTION component_vulnerability_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.component_vulnerability where  component_table_id = new.component_table_id AND vuln_id = new.vuln_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.component_vulnerability SET
+              component_table_id = new.component_table_id, vuln_id = new.vuln_id, severity = new.severity, remediation_status = new.remediation_status, target_date = new.target_date, actual_date = new.actual_date, comment = new.comment, description = new.description, base_score = new.base_score, exploit_score = new.exploit_score, impact_score = new.impact_score, related_vuln_id = new.related_vuln_id
+        WHERE  component_table_id = new.component_table_id AND vuln_id = new.vuln_id ;
+     else
+        insert into pdata.component_vulnerability (
+          component_table_id,vuln_id,severity,remediation_status,target_date,actual_date,comment,description,base_score,exploit_score,impact_score,related_vuln_id )
+        VALUES (
+          new.component_table_id,new.vuln_id,new.severity,new.remediation_status,new.target_date,new.actual_date,new.comment,new.description,new.base_score,new.exploit_score,new.impact_score,new.related_vuln_id );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger component_vulnerability_update after update on component_vulnerability
+for each row execute procedure component_vulnerability_update();
+
+create trigger component_vulnerability_insert after insert on component_vulnerability
+for each row execute procedure component_vulnerability_update();
+
+-----------------------------------
+-- processing table project
+-- project
+-- project_id project_name owner tier description
+-- project_id
+-- project_id = new.project_id
+CREATE OR REPLACE FUNCTION project_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.project where  project_id = new.project_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.project SET
+              project_id = new.project_id, project_name = new.project_name, owner = new.owner, tier = new.tier, description = new.description
+        WHERE  project_id = new.project_id ;
+     else
+        insert into pdata.project (
+          project_id,project_name,owner,tier,description )
+        VALUES (
+          new.project_id,new.project_name,new.owner,new.tier,new.description );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger project_update after update on project
+for each row execute procedure project_update();
+
+create trigger project_insert after insert on project
+for each row execute procedure project_update();
+
+-----------------------------------
+-- processing table project_mapping
+-- project_mapping
+-- project_id application_id
+-- project_id, application_id
+-- project_id = new.project_id AND application_id = new.application_id
+CREATE OR REPLACE FUNCTION project_mapping_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.project_mapping where  project_id = new.project_id AND application_id = new.application_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.project_mapping SET
+              project_id = new.project_id, application_id = new.application_id
+        WHERE  project_id = new.project_id AND application_id = new.application_id ;
+     else
+        insert into pdata.project_mapping (
+          project_id,application_id )
+        VALUES (
+          new.project_id,new.application_id );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger project_mapping_update after update on project_mapping
+for each row execute procedure project_mapping_update();
+
+create trigger project_mapping_insert after insert on project_mapping
+for each row execute procedure project_mapping_update();
+
+-----------------------------------
+-- processing table project_version
+-- project_version
+-- project_id version_id version_name phase distribution released_on notes nickname
+-- project_id, version_id
+-- project_id = new.project_id AND version_id = new.version_id
+CREATE OR REPLACE FUNCTION project_version_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.project_version where  project_id = new.project_id AND version_id = new.version_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.project_version SET
+              project_id = new.project_id, version_id = new.version_id, version_name = new.version_name, phase = new.phase, distribution = new.distribution, released_on = new.released_on, notes = new.notes, nickname = new.nickname
+        WHERE  project_id = new.project_id AND version_id = new.version_id ;
+     else
+        insert into pdata.project_version (
+          project_id,version_id,version_name,phase,distribution,released_on,notes,nickname )
+        VALUES (
+          new.project_id,new.version_id,new.version_name,new.phase,new.distribution,new.released_on,new.notes,new.nickname );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger project_version_update after update on project_version
+for each row execute procedure project_version_update();
+
+create trigger project_version_insert after insert on project_version
+for each row execute procedure project_version_update();
+
+-----------------------------------
+-- processing table v_hub_report
+-- v_hub_report
+-- installed_rank version description type script checksum installed_by installed_on execution_time success
+-- installed_rank
+-- installed_rank = new.installed_rank
+CREATE OR REPLACE FUNCTION v_hub_report_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.v_hub_report where  installed_rank = new.installed_rank  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.v_hub_report SET
+              installed_rank = new.installed_rank, version = new.version, description = new.description, type = new.type, script = new.script, checksum = new.checksum, installed_by = new.installed_by, installed_on = new.installed_on, execution_time = new.execution_time, success = new.success
+        WHERE  installed_rank = new.installed_rank ;
+     else
+        insert into pdata.v_hub_report (
+          installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
+        VALUES (
+          new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger v_hub_report_update after update on v_hub_report
+for each row execute procedure v_hub_report_update();
+
+create trigger v_hub_report_insert after insert on v_hub_report
+for each row execute procedure v_hub_report_update();
+
+-----------------------------------
+-- processing table v_report_db
+-- v_report_db
+-- installed_rank version description type script checksum installed_by installed_on execution_time success
+-- installed_rank
+-- installed_rank = new.installed_rank
+CREATE OR REPLACE FUNCTION v_report_db_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.v_report_db where  installed_rank = new.installed_rank  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.v_report_db SET
+              installed_rank = new.installed_rank, version = new.version, description = new.description, type = new.type, script = new.script, checksum = new.checksum, installed_by = new.installed_by, installed_on = new.installed_on, execution_time = new.execution_time, success = new.success
+        WHERE  installed_rank = new.installed_rank ;
+     else
+        insert into pdata.v_report_db (
+          installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
+        VALUES (
+          new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger v_report_db_update after update on v_report_db
+for each row execute procedure v_report_db_update();
+
+create trigger v_report_db_insert after insert on v_report_db
+for each row execute procedure v_report_db_update();
+
+-----------------------------------
+-- processing table vulndb_record
+-- vulndb_record
+-- vulndb_id description technical_description published_date updated_date solution score base_score impact_subscore exploitability_subscore access_vector access_complexity authentication confidentiality_impact integrity_impact availability_impact
+-- vulndb_id
+-- vulndb_id = new.vulndb_id
+CREATE OR REPLACE FUNCTION vulndb_record_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.vulndb_record where  vulndb_id = new.vulndb_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.vulndb_record SET
+              vulndb_id = new.vulndb_id, description = new.description, technical_description = new.technical_description, published_date = new.published_date, updated_date = new.updated_date, solution = new.solution, score = new.score, base_score = new.base_score, impact_subscore = new.impact_subscore, exploitability_subscore = new.exploitability_subscore, access_vector = new.access_vector, access_complexity = new.access_complexity, authentication = new.authentication, confidentiality_impact = new.confidentiality_impact, integrity_impact = new.integrity_impact, availability_impact = new.availability_impact
+        WHERE  vulndb_id = new.vulndb_id ;
+     else
+        insert into pdata.vulndb_record (
+          vulndb_id,description,technical_description,published_date,updated_date,solution,score,base_score,impact_subscore,exploitability_subscore,access_vector,access_complexity,authentication,confidentiality_impact,integrity_impact,availability_impact )
+        VALUES (
+          new.vulndb_id,new.description,new.technical_description,new.published_date,new.updated_date,new.solution,new.score,new.base_score,new.impact_subscore,new.exploitability_subscore,new.access_vector,new.access_complexity,new.authentication,new.confidentiality_impact,new.integrity_impact,new.availability_impact );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger vulndb_record_update after update on vulndb_record
+for each row execute procedure vulndb_record_update();
+
+create trigger vulndb_record_insert after insert on vulndb_record
+for each row execute procedure vulndb_record_update();
+
+-----------------------------------
+-- processing table vulndb_record_classification
+-- vulndb_record_classification
+-- vulndb_id classification_id description longname name
+-- vulndb_id, classification_id
+-- vulndb_id = new.vulndb_id AND classification_id = new.classification_id
+CREATE OR REPLACE FUNCTION vulndb_record_classification_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.vulndb_record_classification where  vulndb_id = new.vulndb_id AND classification_id = new.classification_id  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.vulndb_record_classification SET
+              vulndb_id = new.vulndb_id, classification_id = new.classification_id, description = new.description, longname = new.longname, name = new.name
+        WHERE  vulndb_id = new.vulndb_id AND classification_id = new.classification_id ;
+     else
+        insert into pdata.vulndb_record_classification (
+          vulndb_id,classification_id,description,longname,name )
+        VALUES (
+          new.vulndb_id,new.classification_id,new.description,new.longname,new.name );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger vulndb_record_classification_update after update on vulndb_record_classification
+for each row execute procedure vulndb_record_classification_update();
+
+create trigger vulndb_record_classification_insert after insert on vulndb_record_classification
+for each row execute procedure vulndb_record_classification_update();
+
+-----------------------------------
+-- processing table vulndb_record_reference_url
+-- vulndb_record_reference_url
+-- vulndb_id url
+-- vulndb_id, url
+-- vulndb_id = new.vulndb_id AND url = new.url
+CREATE OR REPLACE FUNCTION vulndb_record_reference_url_update()
+  RETURNS trigger AS
+$BODY$
+begin
+     if (select EXISTS(select 1 from pdata.vulndb_record_reference_url where  vulndb_id = new.vulndb_id AND url = new.url  )) then
+        --found; update, and return null to prevent insert
+        UPDATE pdata.vulndb_record_reference_url SET
+              vulndb_id = new.vulndb_id, url = new.url
+        WHERE  vulndb_id = new.vulndb_id AND url = new.url ;
+     else
+        insert into pdata.vulndb_record_reference_url (
+          vulndb_id,url )
+        VALUES (
+          new.vulndb_id,new.url );
+     end if;
+     return new;
+end
+$BODY$
+LANGUAGE plpgsql;
+
+create trigger vulndb_record_reference_url_update after update on vulndb_record_reference_url
+for each row execute procedure vulndb_record_reference_url_update();
+
+create trigger vulndb_record_reference_url_insert after insert on vulndb_record_reference_url
+for each row execute procedure vulndb_record_reference_url_update();

@@ -1,0 +1,73 @@
+-- This will destroy pdata tables and data
+-- Use at your own peril
+
+
+\c bds_hub_report
+
+-- cleanup for component
+drop trigger if exists component_insert on component;
+drop trigger if exists component_update on component;
+drop function if exists component_update();
+
+-- cleanup for component_license
+drop trigger if exists component_license_insert on component_license;
+drop trigger if exists component_license_update on component_license;
+drop function if exists component_license_update();
+
+-- cleanup for component_match_types
+drop trigger if exists component_match_types_insert on component_match_types;
+drop trigger if exists component_match_types_update on component_match_types;
+drop function if exists component_match_types_update();
+
+-- cleanup for component_usages
+drop trigger if exists component_usages_insert on component_usages;
+drop trigger if exists component_usages_update on component_usages;
+drop function if exists component_usages_update();
+
+-- cleanup for component_vulnerability
+drop trigger if exists component_vulnerability_insert on component_vulnerability;
+drop trigger if exists component_vulnerability_update on component_vulnerability;
+drop function if exists component_vulnerability_update();
+
+-- cleanup for project
+drop trigger if exists project_insert on project;
+drop trigger if exists project_update on project;
+drop function if exists project_update();
+
+-- cleanup for project_mapping
+drop trigger if exists project_mapping_insert on project_mapping;
+drop trigger if exists project_mapping_update on project_mapping;
+drop function if exists project_mapping_update();
+
+-- cleanup for project_version
+drop trigger if exists project_version_insert on project_version;
+drop trigger if exists project_version_update on project_version;
+drop function if exists project_version_update();
+
+-- cleanup for v_hub_report
+drop trigger if exists v_hub_report_insert on v_hub_report;
+drop trigger if exists v_hub_report_update on v_hub_report;
+drop function if exists v_hub_report_update();
+
+-- cleanup for v_report_db
+drop trigger if exists v_report_db_insert on v_report_db;
+drop trigger if exists v_report_db_update on v_report_db;
+drop function if exists v_report_db_update();
+
+-- cleanup for vulndb_record
+drop trigger if exists vulndb_record_insert on vulndb_record;
+drop trigger if exists vulndb_record_update on vulndb_record;
+drop function if exists vulndb_record_update();
+
+-- cleanup for vulndb_record_classification
+drop trigger if exists vulndb_record_classification_insert on vulndb_record_classification;
+drop trigger if exists vulndb_record_classification_update on vulndb_record_classification;
+drop function if exists vulndb_record_classification_update();
+
+-- cleanup for vulndb_record_reference_url
+drop trigger if exists vulndb_record_reference_url_insert on vulndb_record_reference_url;
+drop trigger if exists vulndb_record_reference_url_update on vulndb_record_reference_url;
+drop function if exists vulndb_record_reference_url_update();
+
+-- dropping pdata schema
+drop schema if exists pdata cascade;
