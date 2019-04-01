@@ -1,6 +1,6 @@
 ## Overview ##
 
-# Repoting database data persistence
+# Reporting database data persistence
 
 ### Deployment and cleanup
 
