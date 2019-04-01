@@ -1,0 +1,42 @@
+-- Setting up persisence for bhd_hub_report
+
+\connect bds_hub_report
+
+CREATE SCHEMA pdata AUTHORIZATION blackduck;
+GRANT USAGE ON SCHEMA pdata TO blackduck_user ;
+GRANT SELECT, INSERT, UPDATE, TRUNCATE, DELETE, REFERENCES ON ALL TABLES IN SCHEMA pdata TO blackduck_user;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA pdata to blackduck_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA pdata GRANT SELECT, INSERT, UPDATE, TRUNCATE, DELETE, REFERENCES ON TABLES TO blackduck_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA pdata GRANT ALL PRIVILEGES ON SEQUENCES TO blackduck_user;
+
+-- create pdata tables
+create table pdata.component ( like component including defaults including constraints including indexes );
+create table pdata.component_license ( like component_license including defaults including constraints including indexes );
+create table pdata.component_match_types ( like component_match_types including defaults including constraints including indexes );
+create table pdata.component_usages ( like component_usages including defaults including constraints including indexes );
+create table pdata.component_vulnerability ( like component_vulnerability including defaults including constraints including indexes );
+create table pdata.project ( like project including defaults including constraints including indexes );
+create table pdata.project_mapping ( like project_mapping including defaults including constraints including indexes );
+create table pdata.project_version ( like project_version including defaults including constraints including indexes );
+create table pdata.v_hub_report ( like v_hub_report including defaults including constraints including indexes );
+create table pdata.v_report_db ( like v_report_db including defaults including constraints including indexes );
+create table pdata.vulndb_record ( like vulndb_record including defaults including constraints including indexes );
+create table pdata.vulndb_record_classification ( like vulndb_record_classification including defaults including constraints including indexes );
+create table pdata.vulndb_record_reference_url ( like vulndb_record_reference_url including defaults including constraints including indexes );
+
+-- copy original data
+insert into pdata.component select * from component;
+insert into pdata.component_license select * from component_license;
+insert into pdata.component_match_types select * from component_match_types;
+insert into pdata.component_usages select * from component_usages;
+insert into pdata.component_vulnerability select * from component_vulnerability;
+insert into pdata.project select * from project;
+insert into pdata.project_mapping select * from project_mapping;
+insert into pdata.project_version select * from project_version;
+insert into pdata.v_hub_report select * from v_hub_report;
+insert into pdata.v_report_db select * from v_report_db;
+insert into pdata.vulndb_record select * from vulndb_record;
+insert into pdata.vulndb_record_classification select * from vulndb_record_classification;
+insert into pdata.vulndb_record_reference_url select * from vulndb_record_reference_url;
+
+--define triggers
