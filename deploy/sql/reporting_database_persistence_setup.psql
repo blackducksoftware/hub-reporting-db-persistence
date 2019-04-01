@@ -44,24 +44,38 @@ insert into pdata.vulndb_record_reference_url select * from vulndb_record_refere
 -----------------------------------
 -- processing table component
 -- component
+-- project_version_id = new.project_version_id AND-- component_id = new.component_id 
+-- project_version_id = new.project_version_id AND-- component_id = new.component_id AND-- component_version_id = new.component_version_id 
+-- project_version_id = new.project_version_id AND-- component_id = new.component_id AND-- component_version_id = new.component_version_id AND-- version_origin_id = new.version_origin_id 
+-- component
 -- id project_version_id component_id component_version_id component_name component_version_name version_origin_id origin_id origin_name ignored policy_approval_status
 -- id
+-- project_version_id,component_id project_version_id,component_id,component_version_id project_version_id,component_id,component_version_id,version_origin_id
 -- id = new.id
 CREATE OR REPLACE FUNCTION component_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.component where  id = new.id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.component SET
-              id = new.id, project_version_id = new.project_version_id, component_id = new.component_id, component_version_id = new.component_version_id, component_name = new.component_name, component_version_name = new.component_version_name, version_origin_id = new.version_origin_id, origin_id = new.origin_id, origin_name = new.origin_name, ignored = new.ignored, policy_approval_status = new.policy_approval_status
-        WHERE  id = new.id ;
-     else
-        insert into pdata.component (
-          id,project_version_id,component_id,component_version_id,component_name,component_version_name,version_origin_id,origin_id,origin_name,ignored,policy_approval_status )
-        VALUES (
-          new.id,new.project_version_id,new.component_id,new.component_version_id,new.component_name,new.component_version_name,new.version_origin_id,new.origin_id,new.origin_name,new.ignored,new.policy_approval_status );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.component WHERE  id = new.id ;
      end if;
+     if (select EXISTS(select 1 from pdata.component where  project_version_id = new.project_version_id AND component_id = new.component_id  )) then
+        --found delete the row to allow clean insert
+        DELETE FROM pdata.component WHERE  project_version_id = new.project_version_id AND component_id = new.component_id ;
+     end if;
+     if (select EXISTS(select 1 from pdata.component where  project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id  )) then
+        --found delete the row to allow clean insert
+        DELETE FROM pdata.component WHERE  project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id ;
+     end if;
+     if (select EXISTS(select 1 from pdata.component where  project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND version_origin_id = new.version_origin_id  )) then
+        --found delete the row to allow clean insert
+        DELETE FROM pdata.component WHERE  project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND version_origin_id = new.version_origin_id ;
+     end if;
+     insert into pdata.component (
+        id,project_version_id,component_id,component_version_id,component_name,component_version_name,version_origin_id,origin_id,origin_name,ignored,policy_approval_status )
+        VALUES (
+        new.id,new.project_version_id,new.component_id,new.component_version_id,new.component_name,new.component_version_name,new.version_origin_id,new.origin_id,new.origin_name,new.ignored,new.policy_approval_status );
      return new;
 end
 $BODY$
@@ -75,25 +89,28 @@ for each row execute procedure component_update();
 
 -----------------------------------
 -- processing table component_license
+-- component_table_id = new.component_table_id AND-- license_display = new.license_display 
 -- component_license
 -- id component_table_id license_display
 -- id
+-- component_table_id,license_display
 -- id = new.id
 CREATE OR REPLACE FUNCTION component_license_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.component_license where  id = new.id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.component_license SET
-              id = new.id, component_table_id = new.component_table_id, license_display = new.license_display
-        WHERE  id = new.id ;
-     else
-        insert into pdata.component_license (
-          id,component_table_id,license_display )
-        VALUES (
-          new.id,new.component_table_id,new.license_display );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.component_license WHERE  id = new.id ;
      end if;
+     if (select EXISTS(select 1 from pdata.component_license where  component_table_id = new.component_table_id AND license_display = new.license_display  )) then
+        --found delete the row to allow clean insert
+        DELETE FROM pdata.component_license WHERE  component_table_id = new.component_table_id AND license_display = new.license_display ;
+     end if;
+     insert into pdata.component_license (
+        id,component_table_id,license_display )
+        VALUES (
+        new.id,new.component_table_id,new.license_display );
      return new;
 end
 $BODY$
