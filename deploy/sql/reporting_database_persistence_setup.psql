@@ -43,7 +43,7 @@ insert into pdata.vulndb_record_reference_url select * from vulndb_record_refere
 
 -----------------------------------
 -- processing table component
--- component
+-- id = new.id 
 -- project_version_id = new.project_version_id AND-- component_id = new.component_id 
 -- project_version_id = new.project_version_id AND-- component_id = new.component_id AND-- component_version_id = new.component_version_id 
 -- project_version_id = new.project_version_id AND-- component_id = new.component_id AND-- component_version_id = new.component_version_id AND-- version_origin_id = new.version_origin_id 
@@ -51,14 +51,14 @@ insert into pdata.vulndb_record_reference_url select * from vulndb_record_refere
 -- id project_version_id component_id component_version_id component_name component_version_name version_origin_id origin_id origin_name ignored policy_approval_status
 -- id
 -- project_version_id,component_id project_version_id,component_id,component_version_id project_version_id,component_id,component_version_id,version_origin_id
--- id = new.id
+-- id = new.id AND project_version_id = new.project_version_id AND component_id = new.component_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND version_origin_id = new.version_origin_id
 CREATE OR REPLACE FUNCTION component_update()
   RETURNS trigger AS
 $BODY$
 begin
-     if (select EXISTS(select 1 from pdata.component where  id = new.id  )) then
+     if (select EXISTS(select 1 from pdata.component where  id = new.id AND project_version_id = new.project_version_id AND component_id = new.component_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND version_origin_id = new.version_origin_id  )) then
         --found; delete the row to allow clean insert
-        DELETE FROM pdata.component WHERE  id = new.id ;
+        DELETE FROM pdata.component WHERE  id = new.id AND project_version_id = new.project_version_id AND component_id = new.component_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND project_version_id = new.project_version_id AND component_id = new.component_id AND component_version_id = new.component_version_id AND version_origin_id = new.version_origin_id ;
      end if;
      if (select EXISTS(select 1 from pdata.component where  project_version_id = new.project_version_id AND component_id = new.component_id  )) then
         --found delete the row to allow clean insert
@@ -89,19 +89,20 @@ for each row execute procedure component_update();
 
 -----------------------------------
 -- processing table component_license
+-- id = new.id 
 -- component_table_id = new.component_table_id AND-- license_display = new.license_display 
 -- component_license
 -- id component_table_id license_display
 -- id
 -- component_table_id,license_display
--- id = new.id
+-- id = new.id AND component_table_id = new.component_table_id AND license_display = new.license_display
 CREATE OR REPLACE FUNCTION component_license_update()
   RETURNS trigger AS
 $BODY$
 begin
-     if (select EXISTS(select 1 from pdata.component_license where  id = new.id  )) then
+     if (select EXISTS(select 1 from pdata.component_license where  id = new.id AND component_table_id = new.component_table_id AND license_display = new.license_display  )) then
         --found; delete the row to allow clean insert
-        DELETE FROM pdata.component_license WHERE  id = new.id ;
+        DELETE FROM pdata.component_license WHERE  id = new.id AND component_table_id = new.component_table_id AND license_display = new.license_display ;
      end if;
      if (select EXISTS(select 1 from pdata.component_license where  component_table_id = new.component_table_id AND license_display = new.license_display  )) then
         --found delete the row to allow clean insert
@@ -124,25 +125,25 @@ for each row execute procedure component_license_update();
 
 -----------------------------------
 -- processing table component_match_types
+-- component_id = new.component_id 
+-- match_type = new.match_type 
 -- component_match_types
 -- component_id match_type
 -- component_id, match_type
+--
 -- component_id = new.component_id AND match_type = new.match_type
 CREATE OR REPLACE FUNCTION component_match_types_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.component_match_types where  component_id = new.component_id AND match_type = new.match_type  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.component_match_types SET
-              component_id = new.component_id, match_type = new.match_type
-        WHERE  component_id = new.component_id AND match_type = new.match_type ;
-     else
-        insert into pdata.component_match_types (
-          component_id,match_type )
-        VALUES (
-          new.component_id,new.match_type );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.component_match_types WHERE  component_id = new.component_id AND match_type = new.match_type ;
      end if;
+     insert into pdata.component_match_types (
+        component_id,match_type )
+        VALUES (
+        new.component_id,new.match_type );
      return new;
 end
 $BODY$
@@ -156,25 +157,25 @@ for each row execute procedure component_match_types_update();
 
 -----------------------------------
 -- processing table component_usages
+-- component_id = new.component_id 
+-- usage = new.usage 
 -- component_usages
 -- component_id usage
 -- component_id, usage
+--
 -- component_id = new.component_id AND usage = new.usage
 CREATE OR REPLACE FUNCTION component_usages_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.component_usages where  component_id = new.component_id AND usage = new.usage  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.component_usages SET
-              component_id = new.component_id, usage = new.usage
-        WHERE  component_id = new.component_id AND usage = new.usage ;
-     else
-        insert into pdata.component_usages (
-          component_id,usage )
-        VALUES (
-          new.component_id,new.usage );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.component_usages WHERE  component_id = new.component_id AND usage = new.usage ;
      end if;
+     insert into pdata.component_usages (
+        component_id,usage )
+        VALUES (
+        new.component_id,new.usage );
      return new;
 end
 $BODY$
@@ -188,25 +189,25 @@ for each row execute procedure component_usages_update();
 
 -----------------------------------
 -- processing table component_vulnerability
+-- component_table_id = new.component_table_id 
+-- vuln_id = new.vuln_id 
 -- component_vulnerability
 -- component_table_id vuln_id severity remediation_status target_date actual_date comment description base_score exploit_score impact_score related_vuln_id
 -- component_table_id, vuln_id
+--
 -- component_table_id = new.component_table_id AND vuln_id = new.vuln_id
 CREATE OR REPLACE FUNCTION component_vulnerability_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.component_vulnerability where  component_table_id = new.component_table_id AND vuln_id = new.vuln_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.component_vulnerability SET
-              component_table_id = new.component_table_id, vuln_id = new.vuln_id, severity = new.severity, remediation_status = new.remediation_status, target_date = new.target_date, actual_date = new.actual_date, comment = new.comment, description = new.description, base_score = new.base_score, exploit_score = new.exploit_score, impact_score = new.impact_score, related_vuln_id = new.related_vuln_id
-        WHERE  component_table_id = new.component_table_id AND vuln_id = new.vuln_id ;
-     else
-        insert into pdata.component_vulnerability (
-          component_table_id,vuln_id,severity,remediation_status,target_date,actual_date,comment,description,base_score,exploit_score,impact_score,related_vuln_id )
-        VALUES (
-          new.component_table_id,new.vuln_id,new.severity,new.remediation_status,new.target_date,new.actual_date,new.comment,new.description,new.base_score,new.exploit_score,new.impact_score,new.related_vuln_id );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.component_vulnerability WHERE  component_table_id = new.component_table_id AND vuln_id = new.vuln_id ;
      end if;
+     insert into pdata.component_vulnerability (
+        component_table_id,vuln_id,severity,remediation_status,target_date,actual_date,comment,description,base_score,exploit_score,impact_score,related_vuln_id )
+        VALUES (
+        new.component_table_id,new.vuln_id,new.severity,new.remediation_status,new.target_date,new.actual_date,new.comment,new.description,new.base_score,new.exploit_score,new.impact_score,new.related_vuln_id );
      return new;
 end
 $BODY$
@@ -220,25 +221,24 @@ for each row execute procedure component_vulnerability_update();
 
 -----------------------------------
 -- processing table project
+-- project_id = new.project_id 
 -- project
 -- project_id project_name owner tier description
 -- project_id
+--
 -- project_id = new.project_id
 CREATE OR REPLACE FUNCTION project_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.project where  project_id = new.project_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.project SET
-              project_id = new.project_id, project_name = new.project_name, owner = new.owner, tier = new.tier, description = new.description
-        WHERE  project_id = new.project_id ;
-     else
-        insert into pdata.project (
-          project_id,project_name,owner,tier,description )
-        VALUES (
-          new.project_id,new.project_name,new.owner,new.tier,new.description );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.project WHERE  project_id = new.project_id ;
      end if;
+     insert into pdata.project (
+        project_id,project_name,owner,tier,description )
+        VALUES (
+        new.project_id,new.project_name,new.owner,new.tier,new.description );
      return new;
 end
 $BODY$
@@ -252,25 +252,25 @@ for each row execute procedure project_update();
 
 -----------------------------------
 -- processing table project_mapping
+-- project_id = new.project_id 
+-- application_id = new.application_id 
 -- project_mapping
 -- project_id application_id
 -- project_id, application_id
+--
 -- project_id = new.project_id AND application_id = new.application_id
 CREATE OR REPLACE FUNCTION project_mapping_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.project_mapping where  project_id = new.project_id AND application_id = new.application_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.project_mapping SET
-              project_id = new.project_id, application_id = new.application_id
-        WHERE  project_id = new.project_id AND application_id = new.application_id ;
-     else
-        insert into pdata.project_mapping (
-          project_id,application_id )
-        VALUES (
-          new.project_id,new.application_id );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.project_mapping WHERE  project_id = new.project_id AND application_id = new.application_id ;
      end if;
+     insert into pdata.project_mapping (
+        project_id,application_id )
+        VALUES (
+        new.project_id,new.application_id );
      return new;
 end
 $BODY$
@@ -284,25 +284,25 @@ for each row execute procedure project_mapping_update();
 
 -----------------------------------
 -- processing table project_version
+-- project_id = new.project_id 
+-- version_id = new.version_id 
 -- project_version
 -- project_id version_id version_name phase distribution released_on notes nickname
 -- project_id, version_id
+--
 -- project_id = new.project_id AND version_id = new.version_id
 CREATE OR REPLACE FUNCTION project_version_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.project_version where  project_id = new.project_id AND version_id = new.version_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.project_version SET
-              project_id = new.project_id, version_id = new.version_id, version_name = new.version_name, phase = new.phase, distribution = new.distribution, released_on = new.released_on, notes = new.notes, nickname = new.nickname
-        WHERE  project_id = new.project_id AND version_id = new.version_id ;
-     else
-        insert into pdata.project_version (
-          project_id,version_id,version_name,phase,distribution,released_on,notes,nickname )
-        VALUES (
-          new.project_id,new.version_id,new.version_name,new.phase,new.distribution,new.released_on,new.notes,new.nickname );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.project_version WHERE  project_id = new.project_id AND version_id = new.version_id ;
      end if;
+     insert into pdata.project_version (
+        project_id,version_id,version_name,phase,distribution,released_on,notes,nickname )
+        VALUES (
+        new.project_id,new.version_id,new.version_name,new.phase,new.distribution,new.released_on,new.notes,new.nickname );
      return new;
 end
 $BODY$
@@ -316,25 +316,24 @@ for each row execute procedure project_version_update();
 
 -----------------------------------
 -- processing table v_hub_report
+-- installed_rank = new.installed_rank 
 -- v_hub_report
 -- installed_rank version description type script checksum installed_by installed_on execution_time success
 -- installed_rank
+--
 -- installed_rank = new.installed_rank
 CREATE OR REPLACE FUNCTION v_hub_report_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.v_hub_report where  installed_rank = new.installed_rank  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.v_hub_report SET
-              installed_rank = new.installed_rank, version = new.version, description = new.description, type = new.type, script = new.script, checksum = new.checksum, installed_by = new.installed_by, installed_on = new.installed_on, execution_time = new.execution_time, success = new.success
-        WHERE  installed_rank = new.installed_rank ;
-     else
-        insert into pdata.v_hub_report (
-          installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
-        VALUES (
-          new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.v_hub_report WHERE  installed_rank = new.installed_rank ;
      end if;
+     insert into pdata.v_hub_report (
+        installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
+        VALUES (
+        new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
      return new;
 end
 $BODY$
@@ -348,25 +347,24 @@ for each row execute procedure v_hub_report_update();
 
 -----------------------------------
 -- processing table v_report_db
+-- installed_rank = new.installed_rank 
 -- v_report_db
 -- installed_rank version description type script checksum installed_by installed_on execution_time success
 -- installed_rank
+--
 -- installed_rank = new.installed_rank
 CREATE OR REPLACE FUNCTION v_report_db_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.v_report_db where  installed_rank = new.installed_rank  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.v_report_db SET
-              installed_rank = new.installed_rank, version = new.version, description = new.description, type = new.type, script = new.script, checksum = new.checksum, installed_by = new.installed_by, installed_on = new.installed_on, execution_time = new.execution_time, success = new.success
-        WHERE  installed_rank = new.installed_rank ;
-     else
-        insert into pdata.v_report_db (
-          installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
-        VALUES (
-          new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.v_report_db WHERE  installed_rank = new.installed_rank ;
      end if;
+     insert into pdata.v_report_db (
+        installed_rank,version,description,type,script,checksum,installed_by,installed_on,execution_time,success )
+        VALUES (
+        new.installed_rank,new.version,new.description,new.type,new.script,new.checksum,new.installed_by,new.installed_on,new.execution_time,new.success );
      return new;
 end
 $BODY$
@@ -380,25 +378,24 @@ for each row execute procedure v_report_db_update();
 
 -----------------------------------
 -- processing table vulndb_record
+-- vulndb_id = new.vulndb_id 
 -- vulndb_record
 -- vulndb_id description technical_description published_date updated_date solution score base_score impact_subscore exploitability_subscore access_vector access_complexity authentication confidentiality_impact integrity_impact availability_impact
 -- vulndb_id
+--
 -- vulndb_id = new.vulndb_id
 CREATE OR REPLACE FUNCTION vulndb_record_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.vulndb_record where  vulndb_id = new.vulndb_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.vulndb_record SET
-              vulndb_id = new.vulndb_id, description = new.description, technical_description = new.technical_description, published_date = new.published_date, updated_date = new.updated_date, solution = new.solution, score = new.score, base_score = new.base_score, impact_subscore = new.impact_subscore, exploitability_subscore = new.exploitability_subscore, access_vector = new.access_vector, access_complexity = new.access_complexity, authentication = new.authentication, confidentiality_impact = new.confidentiality_impact, integrity_impact = new.integrity_impact, availability_impact = new.availability_impact
-        WHERE  vulndb_id = new.vulndb_id ;
-     else
-        insert into pdata.vulndb_record (
-          vulndb_id,description,technical_description,published_date,updated_date,solution,score,base_score,impact_subscore,exploitability_subscore,access_vector,access_complexity,authentication,confidentiality_impact,integrity_impact,availability_impact )
-        VALUES (
-          new.vulndb_id,new.description,new.technical_description,new.published_date,new.updated_date,new.solution,new.score,new.base_score,new.impact_subscore,new.exploitability_subscore,new.access_vector,new.access_complexity,new.authentication,new.confidentiality_impact,new.integrity_impact,new.availability_impact );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.vulndb_record WHERE  vulndb_id = new.vulndb_id ;
      end if;
+     insert into pdata.vulndb_record (
+        vulndb_id,description,technical_description,published_date,updated_date,solution,score,base_score,impact_subscore,exploitability_subscore,access_vector,access_complexity,authentication,confidentiality_impact,integrity_impact,availability_impact )
+        VALUES (
+        new.vulndb_id,new.description,new.technical_description,new.published_date,new.updated_date,new.solution,new.score,new.base_score,new.impact_subscore,new.exploitability_subscore,new.access_vector,new.access_complexity,new.authentication,new.confidentiality_impact,new.integrity_impact,new.availability_impact );
      return new;
 end
 $BODY$
@@ -412,25 +409,25 @@ for each row execute procedure vulndb_record_update();
 
 -----------------------------------
 -- processing table vulndb_record_classification
+-- vulndb_id = new.vulndb_id 
+-- classification_id = new.classification_id 
 -- vulndb_record_classification
 -- vulndb_id classification_id description longname name
 -- vulndb_id, classification_id
+--
 -- vulndb_id = new.vulndb_id AND classification_id = new.classification_id
 CREATE OR REPLACE FUNCTION vulndb_record_classification_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.vulndb_record_classification where  vulndb_id = new.vulndb_id AND classification_id = new.classification_id  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.vulndb_record_classification SET
-              vulndb_id = new.vulndb_id, classification_id = new.classification_id, description = new.description, longname = new.longname, name = new.name
-        WHERE  vulndb_id = new.vulndb_id AND classification_id = new.classification_id ;
-     else
-        insert into pdata.vulndb_record_classification (
-          vulndb_id,classification_id,description,longname,name )
-        VALUES (
-          new.vulndb_id,new.classification_id,new.description,new.longname,new.name );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.vulndb_record_classification WHERE  vulndb_id = new.vulndb_id AND classification_id = new.classification_id ;
      end if;
+     insert into pdata.vulndb_record_classification (
+        vulndb_id,classification_id,description,longname,name )
+        VALUES (
+        new.vulndb_id,new.classification_id,new.description,new.longname,new.name );
      return new;
 end
 $BODY$
@@ -444,25 +441,25 @@ for each row execute procedure vulndb_record_classification_update();
 
 -----------------------------------
 -- processing table vulndb_record_reference_url
+-- vulndb_id = new.vulndb_id 
+-- url = new.url 
 -- vulndb_record_reference_url
 -- vulndb_id url
 -- vulndb_id, url
+--
 -- vulndb_id = new.vulndb_id AND url = new.url
 CREATE OR REPLACE FUNCTION vulndb_record_reference_url_update()
   RETURNS trigger AS
 $BODY$
 begin
      if (select EXISTS(select 1 from pdata.vulndb_record_reference_url where  vulndb_id = new.vulndb_id AND url = new.url  )) then
-        --found; update, and return null to prevent insert
-        UPDATE pdata.vulndb_record_reference_url SET
-              vulndb_id = new.vulndb_id, url = new.url
-        WHERE  vulndb_id = new.vulndb_id AND url = new.url ;
-     else
-        insert into pdata.vulndb_record_reference_url (
-          vulndb_id,url )
-        VALUES (
-          new.vulndb_id,new.url );
+        --found; delete the row to allow clean insert
+        DELETE FROM pdata.vulndb_record_reference_url WHERE  vulndb_id = new.vulndb_id AND url = new.url ;
      end if;
+     insert into pdata.vulndb_record_reference_url (
+        vulndb_id,url )
+        VALUES (
+        new.vulndb_id,new.url );
      return new;
 end
 $BODY$

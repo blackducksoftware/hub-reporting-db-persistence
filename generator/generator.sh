@@ -9,8 +9,8 @@ UKEY_LIST=$(cat ${1}.tbl  | grep UNIQUE | cut -d '(' -f 2 | cut -d ')' -f 1 | se
 FIELD_LIST=$(echo ${COLUMNS} | sed 's/ /,/g')
 VALUE_LIST=$(for i in $COLUMNS ; do echo -n "new.${i}," ; done | sed 's/,$//' )
 UPDATE_SET=$(for i in $COLUMNS ; do echo -n " ${i} = new.${i}," ; done | sed 's/,$//' )
-WHERE_CLAUSE=$(for i in $UKEY_LIST $PKEY_LIST ; do echo -n " ${i%,} = new.${i%,} AND" ; done | sed 's/AND$//' )
-for i in $UKEY_LIST
+WHERE_CLAUSE=$(for i in $PKEY_LIST $UKEY_LIST ; do for j in $(echo $i | sed 's/,/ /g'); do echo -n " ${j%,} = new.${j%,} AND" ; done ; done | sed 's/AND$//' )
+for i in $PKEY_LIST $UKEY_LIST
 do
   for j in $(echo $i | sed 's/,/ /g') 
   do
