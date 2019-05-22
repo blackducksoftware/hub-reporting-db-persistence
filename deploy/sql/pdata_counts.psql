@@ -1,0 +1,13 @@
+select (select count(*) from component) as component, (select count(*) from pdata.component) as pcomponent;
+select (select count(*) from component_license) as component_license, (select count(*) from pdata.component_license) as pcomponent_license;
+select (select count(*) from component_match_types) as component_match_types, (select count(*) from pdata.component_match_types) as pcomponent_match_types;
+select (select count(*) from component_usages) as component_usages, (select count(*) from pdata.component_usages) as pcomponent_usages;
+select (select count(*) from component_vulnerability) as component_vulnerability, (select count(*) from pdata.component_vulnerability) as pcomponent_vulnerability;
+select (select count(*) from project) as project, (select count(*) from pdata.project) as pproject;
+select (select count(*) from project_mapping) as project_mapping, (select count(*) from pdata.project_mapping) as pproject_mapping;
+select (select count(*) from project_version) as project_version, (select count(*) from pdata.project_version) as pproject_version;
+select (select count(*) from v_hub_report) as v_hub_report, (select count(*) from pdata.v_hub_report) as pv_hub_report;
+select (select count(*) from v_report_db) as v_report_db, (select count(*) from pdata.v_report_db) as pv_report_db;
+select (select count(*) from vulndb_record) as vulndb_record, (select count(*) from pdata.vulndb_record) as pvulndb_record;
+select (select count(*) from vulndb_record_classification) as vulndb_record_classification, (select count(*) from pdata.vulndb_record_classification) as pvulndb_record_classification;
+select (select count(*) from vulndb_record_reference_url) as vulndb_record_reference_url, (select count(*) from pdata.vulndb_record_reference_url) as pvulndb_record_reference_url;
