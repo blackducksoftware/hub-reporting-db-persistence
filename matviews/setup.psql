@@ -1,0 +1,9 @@
+\c bds_hub_report
+
+
+CREATE EXTENSION postgres_fdw;
+CREATE SERVER bds_hub FOREIGN DATA WRAPPER postgres_fdw OPTIONS (dbname'bds_hub');
+CREATE USER MAPPING FOR CURRENT_USER SERVER bds_hub;
+CREATE SCHEMA bds_hub;
+IMPORT FOREIGN SCHEMA reporting FROM SERVER bds_hub INTO reporting;
+

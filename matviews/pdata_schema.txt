@@ -1,0 +1,134 @@
+           Table "pdata.component"
+         Column         |  Type   | Modifiers 
+------------------------+---------+-----------
+ id                     | bigint  | not null
+ project_version_id     | uuid    | 
+ component_id           | uuid    | 
+ component_version_id   | uuid    | 
+ component_name         | text    | 
+ component_version_name | text    | 
+ version_origin_id      | uuid    | 
+ origin_id              | text    | 
+ origin_name            | text    | 
+ ignored                | boolean | 
+ policy_approval_status | text    | 
+Indexes:
+    "component_pkey" PRIMARY KEY, btree (id)
+
+     Table "pdata.component_license"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | 
+ id                 | bigint | not null
+ component_table_id | bigint | 
+ license_display    | text   | 
+Indexes:
+    "component_license_pkey" PRIMARY KEY, btree (id)
+
+   Table "pdata.component_match_types"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | not null
+ component_id       | bigint | not null
+ match_type         | text   | 
+Indexes:
+    "component_match_types_pkey" PRIMARY KEY, btree (project_version_id, component_id)
+
+     Table "pdata.component_matches"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | not null
+ component_table_id | bigint | not null
+ match_id           | bigint | not null
+ match_type         | text   | 
+ match_path         | text   | 
+ match_file_name    | text   | 
+Indexes:
+    "component_matches_pkey" PRIMARY KEY, btree (project_version_id, component_table_id, match_id)
+
+    Table "pdata.component_policies"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | not null
+ component_table_id | bigint | not null
+ policy_id          | uuid   | not null
+ policy_name        | text   | 
+ policy_status      | text   | 
+ overridden_by      | uuid[] | 
+ override_comment   | text[] | 
+Indexes:
+    "component_policies_pkey" PRIMARY KEY, btree (project_version_id, component_table_id, policy_id)
+
+     Table "pdata.component_usages"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | not null
+ component_id       | bigint | not null
+ usage              | text   | 
+Indexes:
+    "component_usages_pkey" PRIMARY KEY, btree (project_version_id, component_id)
+
+            Table "pdata.component_vulnerability"
+       Column       |            Type             | Modifiers 
+--------------------+-----------------------------+-----------
+ project_version_id | uuid                        | not null
+ component_table_id | bigint                      | not null
+ vuln_id            | text                        | not null
+ related_vuln_id    | text                        | 
+ vuln_source        | text                        | 
+ severity           | text                        | 
+ remediation_status | text                        | 
+ target_date        | timestamp(6) with time zone | 
+ actual_date        | timestamp(6) with time zone | 
+ comment            | text                        | 
+ description        | text                        | 
+ base_score         | double precision            | 
+ exploit_score      | double precision            | 
+ impact_score       | double precision            | 
+ temporal_score     | double precision            | 
+Indexes:
+    "component_vulnerability_pkey" PRIMARY KEY, btree (project_version_id, component_table_id, vuln_id)
+
+        Table "pdata.project"
+    Column    |   Type   | Modifiers 
+--------------+----------+-----------
+ project_id   | uuid     | not null
+ project_name | text     | 
+ owner        | uuid     | 
+ tier         | smallint | 
+ description  | text     | 
+Indexes:
+    "project_pkey" PRIMARY KEY, btree (project_id)
+
+   Table "pdata.project_mapping"
+     Column     | Type | Modifiers 
+----------------+------+-----------
+ project_id     | uuid | not null
+ application_id | text | not null
+Indexes:
+    "project_mapping_pkey" PRIMARY KEY, btree (project_id, application_id)
+
+             Table "pdata.project_version"
+    Column    |            Type             | Modifiers 
+--------------+-----------------------------+-----------
+ project_id   | uuid                        | not null
+ version_id   | uuid                        | not null
+ version_name | text                        | 
+ phase        | text                        | 
+ distribution | text                        | 
+ released_on  | timestamp(6) with time zone | 
+ notes        | text                        | 
+ nickname     | text                        | 
+Indexes:
+    "project_version_pkey" PRIMARY KEY, btree (project_id, version_id)
+
+Table "pdata.project_version_code_location"
+       Column       |  Type  | Modifiers 
+--------------------+--------+-----------
+ project_version_id | uuid   | not null
+ id                 | uuid   | not null
+ name               | text   | 
+ last_scan_time     | bigint | 
+Indexes:
+    "project_version_code_location_pkey" PRIMARY KEY, btree (project_version_id, id)
+

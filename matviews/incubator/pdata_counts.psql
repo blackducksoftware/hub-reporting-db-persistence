@@ -1,0 +1,12 @@
+select count(*) from pdata.component ;
+select count(*) from pdata.component_license;
+select count(*) from pdata.component_match_types;
+select count(*) from pdata.component_matches;
+select count(*) from pdata.component_policies;
+select count(*) from pdata.component_usages;
+select count(*) from pdata.component_vulnerability;
+select count(*) from pdata.project;
+select count(*) from pdata.project_mapping;
+select count(*) from pdata.project_version;
+select count(*) from pdata.project_version_code_location;
+

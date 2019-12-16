@@ -1,0 +1,29 @@
+\c bds_hub
+
+refresh materialized view reporting.component;
+refresh materialized view reporting.component_license;
+refresh materialized view reporting.component_match_types;
+refresh materialized view reporting.component_matches;
+refresh materialized view reporting.component_policies;
+refresh materialized view reporting.component_usages;
+refresh materialized view reporting.component_vulnerability;
+refresh materialized view reporting.project;
+refresh materialized view reporting.project_mapping;
+refresh materialized view reporting.project_version;
+refresh materialized view reporting.project_version_code_location;
+
+
+\c bds_hub_report
+
+insert into pdata.component select * from bds_hub.component on conflict on constraint component_pkey do nothing;
+insert into pdata.component_license select * from bds_hub.component_license on conflict on constraint component_license_pkey do nothing;
+insert into pdata.component_match_types select * from bds_hub.component_match_types on conflict on constraint component_match_types_pkey do nothing;
+insert into pdata.component_matches select * from bds_hub.component_matches on conflict on constraint component_matches_pkey do nothing;
+insert into pdata.component_policies select * from bds_hub.component_policies on conflict on constraint component_policies_pkey do nothing;
+insert into pdata.component_usages select * from bds_hub.component_usages on conflict on constraint component_usages_pkey do nothing;
+insert into pdata.component_vulnerability select * from bds_hub.component_vulnerability on conflict on constraint component_vulnerability_pkey do nothing;
+insert into pdata.project select * from bds_hub.project on conflict on constraint project_pkey do nothing;
+insert into pdata.project_mapping select * from bds_hub.project_mapping on conflict on constraint project_mapping_pkey do nothing;
+insert into pdata.project_version select * from bds_hub.project_version on conflict on constraint project_version_pkey do nothing;
+insert into pdata.project_version_code_location select * from bds_hub.project_version_code_location on conflict on constraint project_version_code_location_pkey do nothing;
+

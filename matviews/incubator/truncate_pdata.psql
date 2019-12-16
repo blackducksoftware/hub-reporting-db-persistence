@@ -1,0 +1,12 @@
+truncate table pdata.component ;
+truncate table pdata.component_license;
+truncate table pdata.component_match_types;
+truncate table pdata.component_matches;
+truncate table pdata.component_policies;
+truncate table pdata.component_usages;
+truncate table pdata.component_vulnerability;
+truncate table pdata.project;
+truncate table pdata.project_mapping;
+truncate table pdata.project_version;
+truncate table pdata.project_version_code_location;
+
