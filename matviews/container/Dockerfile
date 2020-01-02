@@ -9,6 +9,7 @@ RUN chmod gu+s /usr/sbin/cron
 #crontab -u my_user /home/my_user/cron.txt
 ADD usr /usr
 ADD opt /opt
+ADD crontabs /var/spool/cron/crontabs
 RUN chmod -R g+x /usr/local/bin/*
 RUN chmod -R g+xw /opt/blackduck/hub/auditor
 RUN useradd auditor

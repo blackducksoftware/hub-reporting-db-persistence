@@ -7,3 +7,27 @@ CREATE USER MAPPING FOR CURRENT_USER SERVER bds_hub;
 CREATE SCHEMA bds_hub;
 IMPORT FOREIGN SCHEMA reporting FROM SERVER bds_hub INTO reporting;
 
+create table pdata.component ( like bds_hub.component including defaults including constraints including indexes );
+create table pdata.component_license ( like bds_hub.component_license including defaults including constraints including indexes );
+create table pdata.component_matches ( like bds_hub.component_matches including defaults including constraints including indexes );
+create table pdata.component_match_types ( like bds_hub.component_match_types including defaults including constraints including indexes );
+create table pdata.component_policies ( like bds_hub.component_policies including defaults including constraints including indexes );
+create table pdata.component_usages ( like bds_hub.component_usages including defaults including constraints including indexes );
+create table pdata.component_vulnerability ( like bds_hub.component_vulnerability including defaults including constraints including indexes );
+create table pdata.project ( like bds_hub.project including defaults including constraints including indexes );
+create table pdata.project_mapping ( like bds_hub.project_mapping including defaults including constraints including indexes );
+create table pdata.project_version ( like bds_hub.project_version including defaults including constraints including indexes );
+create table pdata.project_version_code_location ( like bds_hub.project_version_code_location including defaults including constraints including indexes );
+
+alter table pdata.component add primary key ();
+alter table pdata.component_license add primary key ();
+alter table pdata.component_matches add primary key ();
+alter table pdata.component_match_types  add primary key ();
+alter table pdata.component_policies add primary key ();
+alter table pdata.component_usages add primary key ();
+alter table pdata.component_vulnerability add primary key ();
+alter table pdata.project add primary key ();
+alter table pdata.project_mapping add primary key ();
+alter table pdata.project_version add primary key ();
+alter table pdata.project_version_code_location add primary key ();
+

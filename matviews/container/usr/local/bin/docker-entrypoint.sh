@@ -191,5 +191,7 @@ if  [ "$1" = 'auditor' ] && [ "$(id -u)" = '0' ]; then
     set -- su-exec auditor:root "$@"
 fi
 
+env | sed 's/= /=/' > /tmp/environment
+
 #exec "$@" "auditor_$HOSTNAME"
 exec "$@" cron -f -L 8
