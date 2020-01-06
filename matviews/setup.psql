@@ -19,15 +19,15 @@ create table pdata.project_mapping ( like bds_hub.project_mapping including defa
 create table pdata.project_version ( like bds_hub.project_version including defaults including constraints including indexes );
 create table pdata.project_version_code_location ( like bds_hub.project_version_code_location including defaults including constraints including indexes );
 
-alter table pdata.component add primary key ();
-alter table pdata.component_license add primary key ();
-alter table pdata.component_matches add primary key ();
-alter table pdata.component_match_types  add primary key ();
-alter table pdata.component_policies add primary key ();
-alter table pdata.component_usages add primary key ();
-alter table pdata.component_vulnerability add primary key ();
-alter table pdata.project add primary key ();
-alter table pdata.project_mapping add primary key ();
-alter table pdata.project_version add primary key ();
-alter table pdata.project_version_code_location add primary key ();
+alter table pdata.component add primary key (id, project_version_id);
+alter table pdata.component_license add primary key (id, component_table_id, project_version_id);
+alter table pdata.component_matches add primary key (match_id, component_table_id, project_version_id);
+alter table pdata.component_match_types  add primary key (component_id, project_version_id);
+alter table pdata.component_policies add primary key (policy_id, component_table_id, project_version_id);
+alter table pdata.component_usages add primary key (component_id, project_version_id);
+alter table pdata.component_vulnerability add primary key (vuln_id, component_table_id, project_version_id);
+alter table pdata.project add primary key (project_id);
+alter table pdata.project_mapping add primary key (application_id, project_id);
+alter table pdata.project_version add primary key (version_id, project_id);
+alter table pdata.project_version_code_location add primary key (id, project_version_id);
 

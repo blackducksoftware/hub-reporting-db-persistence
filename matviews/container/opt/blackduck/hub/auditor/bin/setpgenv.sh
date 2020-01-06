@@ -7,7 +7,7 @@ then
 fi
 export PGHOST=${HUB_POSTGRES_HOST:-postgres}
 export PGPORT=${HUB_POSTGRES_PORT:-5432}
-export PGUSER=${HUB_POSTGRES_USER:-blackduck}
+export PGUSER=${HUB_POSTGRES_ADMIN:-blackduck}
 
 
 cp /opt/blackduck/hub/auditor/security/hub-db-admin.pem /tmp/key.pem

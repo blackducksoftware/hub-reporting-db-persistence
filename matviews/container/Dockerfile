@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 RUN apt-get update
-RUN apt-get update && apt-get -y install cron postgresql-client curl jq vim bsdmainutils openjdk-8-jre
+RUN apt-get update && apt-get -y install cron time postgresql-client curl jq vim bsdmainutils openjdk-8-jre
 
 RUN chmod gu+rw /var/run
 RUN chmod gu+s /usr/sbin/cron
@@ -9,11 +9,11 @@ RUN chmod gu+s /usr/sbin/cron
 #crontab -u my_user /home/my_user/cron.txt
 ADD usr /usr
 ADD opt /opt
-ADD crontabs /var/spool/cron/crontabs
 RUN chmod -R g+x /usr/local/bin/*
 RUN chmod -R g+xw /opt/blackduck/hub/auditor
 RUN useradd auditor
 #RUN echo export JAVA_HOME=$( readlink -f /etc/alternatives/java | sed 's&/bin/java&&') >>/etc/profile
+ADD --chown=auditor:crontab crontabs /var/spool/cron/crontabs
 
 # Run the command on container startup
 ENTRYPOINT docker-entrypoint.sh
