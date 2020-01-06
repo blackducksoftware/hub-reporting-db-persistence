@@ -1,0 +1,59 @@
+kind: List
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: auditor
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: auditor
+        tier: auditor
+    template:
+      metadata:
+        name: auditor
+        labels:
+          app: auditor
+          tier: auditor
+      spec:
+#        securityContext:
+#          runAsUser: 1000
+        volumes:
+        - name: dir-auditor
+          emptyDir: {medium: "Memory"}
+        - name: db-passwords
+          secret:
+            secretName: db-creds
+            items:
+            - key: blackduck
+              path: HUB_POSTGRES_ADMIN_PASSWORD_FILE
+            - key: blackduck_user
+              path: HUB_POSTGRES_USER_PASSWORD_FILE
+        containers:
+        - name: auditor
+          volumeMounts:
+          - name: dir-auditor
+            mountPath: /opt/blackduck/hub/auditor/security
+          - name: db-passwords
+            mountPath: /tmp/secrets
+          image: gsasig/chronos:0.01
+          name: auditor
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 1
+              memory: 4608M
+            limits:
+              cpu: 1
+              memory: 4608M
+          envFrom:
+          - configMapRef:
+              name: hub-config
+          - configMapRef:
+              name: hub-db-config
+          - configMapRef:
+              name: hub-db-config-granular
+          - secretRef:
+              name: hub-proxy-pass
