@@ -18,8 +18,8 @@ items:
           app: auditor
           tier: auditor
       spec:
-        securityContext:
-          runAsUser: 1000
+#        securityContext:
+#          runAsUser: 1000
         volumes:
         - name: dir-auditor
           emptyDir: {medium: "Memory"}

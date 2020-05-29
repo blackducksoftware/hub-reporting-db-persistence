@@ -8,5 +8,5 @@ insert into pdata.component_vulnerability select * from bds_hub.component_vulner
 insert into pdata.project select * from bds_hub.project on conflict on constraint project_pkey do nothing;
 insert into pdata.project_mapping select * from bds_hub.project_mapping on conflict on constraint project_mapping_pkey do nothing;
 insert into pdata.project_version select * from bds_hub.project_version on conflict on constraint project_version_pkey do nothing;
-insert into pdata.project_version_code_location select * from bds_hub.project_version_code_location on conflict on constraint project_version_code_location_pkey do nothing;
+insert into pdata.project_version_code_location select * from bds_hub.project_version_code_location where project_version_id is not null on conflict on constraint project_version_code_location_pkey do nothing;
 

@@ -5,7 +5,9 @@ CREATE EXTENSION postgres_fdw;
 CREATE SERVER bds_hub FOREIGN DATA WRAPPER postgres_fdw OPTIONS (dbname'bds_hub');
 CREATE USER MAPPING FOR CURRENT_USER SERVER bds_hub;
 CREATE SCHEMA bds_hub;
-IMPORT FOREIGN SCHEMA reporting FROM SERVER bds_hub INTO reporting;
+IMPORT FOREIGN SCHEMA reporting FROM SERVER bds_hub INTO bds_hub;
+
+CREATE SCHEMA pdata;
 
 create table pdata.component ( like bds_hub.component including defaults including constraints including indexes );
 create table pdata.component_license ( like bds_hub.component_license including defaults including constraints including indexes );

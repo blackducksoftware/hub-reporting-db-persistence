@@ -23,6 +23,7 @@ echo
 echo "Executing Materialized views refresh ..."
 echo 
 time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views.psql bds_hub
+time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views_aux.psql bds_hub
 
 echo 
 echo "Done"
@@ -34,6 +35,7 @@ echo "Executing data synchronization"
 echo
 
 time -p  psql -f /opt/blackduck/hub/auditor/query/update_pdata.psql bds_hub_report
+time -p  psql -f /opt/blackduck/hub/auditor/query/update_pdata_aux.psql bds_hub_report
 
 echo
 echo "Done"

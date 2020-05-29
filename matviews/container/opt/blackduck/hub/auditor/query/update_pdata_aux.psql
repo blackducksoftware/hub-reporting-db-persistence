@@ -1,0 +1,5 @@
+\c bds_hub_report
+
+insert into pdata.project_aux select * from project_aux where project_id is not null on conflict on constraint project_aux_pkey do nothing;
+insert into pdata.project_version_aux select * from project_version_aux where project_id is not null on conflict on constraint project_version_aux_pkey do nothing;
+
