@@ -1,0 +1,15 @@
+\c bds_hub
+  
+refresh materialized view concurrently reporting.component;
+refresh materialized view concurrently reporting.component_license;
+refresh materialized view concurrently reporting.component_match_types;
+refresh materialized view concurrently reporting.component_matches;
+refresh materialized view concurrently reporting.component_policies;
+refresh materialized view concurrently reporting.component_usages;
+refresh materialized view concurrently reporting.component_vulnerability;
+refresh materialized view concurrently reporting.project;
+refresh materialized view concurrently reporting.project_mapping;
+refresh materialized view concurrently reporting.project_version;
+refresh materialized view concurrently reporting.project_version_code_location;
+
+

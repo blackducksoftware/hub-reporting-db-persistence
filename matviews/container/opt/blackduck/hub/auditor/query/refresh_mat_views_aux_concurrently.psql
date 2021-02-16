@@ -1,0 +1,6 @@
+\c bds_hub_report
+  
+refresh materialized view concurrently project_aux;
+refresh materialized view concurrently project_version_aux;
+
+

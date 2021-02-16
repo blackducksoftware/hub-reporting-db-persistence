@@ -22,8 +22,14 @@ date
 echo
 echo "Executing Materialized views refresh ..."
 echo 
-time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views.psql bds_hub
-time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views_aux.psql bds_hub
+if [ "${CONCURRENT_UPDATE:-YES}" = "YES" ]
+then
+	time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views_concurrently.psql
+	time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views_aux_concurrently.psql
+else
+	time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views.psql bds_hub
+	time -p  psql -f /opt/blackduck/hub/auditor/query/refresh_mat_views_aux.psql bds_hub
+fi
 
 echo 
 echo "Done"
